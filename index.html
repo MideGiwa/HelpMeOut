@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Screen Recording</title>
+</head>
+
+<body>
+    <button id="startButton">Start Recording</button>
+    <button id="stopButton" disabled>Stop Recording</button>
+
+    <script>
+        const startButton = document.getElementById('startButton');
+        const stopButton = document.getElementById('stopButton');
+        let mediaRecorder;
+        let recordedChunks = [];
+        let stream;
+
+        startButton.addEventListener('click', async () => {
+            try {
+                const stream = await navigator.mediaDevices.getDisplayMedia({ video: true });
+                const mediaRecorder = new MediaRecorder(stream);
+
+                mediaRecorder.ondataavailable = (event) => {
+                    if (event.data.size > 0) {
+                        recordedChunks.push(event.data);
+                    }
+                };
+
+                mediaRecorder.onstop = () => {
+                    const blob = new Blob(recordedChunks, { type: 'video/webm' });
+                    sendRecordingToAPI(blob); // Send the recorded data to the API
+                };
+
+                mediaRecorder.start();
+                startButton.disabled = true;
+                stopButton.disabled = false;
+            } catch (error) {
+                console.error('Error accessing screen:', error);
+            }
+        });
+
+        stopButton.addEventListener('click', () => {
+            if (mediaRecorder && mediaRecorder.state === 'recording') {
+                mediaRecorder.stop();
+                stream.getTracks().forEach(track => track.stop());
+                startButton.disabled = false;
+                stopButton.disabled = true;
+            }
+        });
+
+        function sendRecordingToAPI(blob) {
+            const formData = new FormData();
+            formData.append('video', blob, 'screen-recording.webm');
+
+            // Replace 'your_upload_endpoint' with your server's endpoint to handle the file upload
+            fetch('your_upload_endpoint', {
+                method: 'POST',
+                body: formData,
+            }).then(response => {
+                // Handle the server response if needed
+            }).catch(error => {
+                console.error('Error uploading file:', error);
+            });
+        }
+
+    </script>
+</body>
+
+</html>
