@@ -11,6 +11,7 @@ app.use(express.json());
 app.use(cors());
 //app.use("/api", router);
 app.use('/videos', express.static('uploads'));
+const video64 = require('./video64')
 
 
 app.use(bodyParser.raw({ type: 'video/mp4', limit: '100mb' }));
@@ -37,10 +38,11 @@ app.post('/new-video', (req, res) => {
 // Route to receive video chunks and append them to the video file
 app.post('/upload/:videoId', (req, res) => {
     const base64Data = req.body.data;
-    const videoId = req.params.videoId || uuidv4();
+    const { videoId } = req.params.videoId || uuidv4();
     const videoFilePath = path.join(videoDirectory, `${videoId}.mp4`);
 
     // Decode the base64 data to binary
+    console.log(base64Data);
     const binaryData = Buffer.from(base64Data, 'base64');
 
     // Append the decoded data to the video file
@@ -49,18 +51,26 @@ app.post('/upload/:videoId', (req, res) => {
             console.error('Error appending data to video file:', err);
             res.status(500).send('Error appending data to video file.');
         } else {
-            res.status(200).send('Chunk received and appended to the video file.');
+            res.status(200).send(`Chunk received and appended to the ${videoId} video file.`);
         }
     });
 });
 
-
 app.get('/videos/:filename', (req, res) => {
-    const fileName = req.params.filename;
-    const videoFilePath = path.join(videoDirectory, `${videoId}.mp4`);;
-})
-app.get('/home', (req, res) => {
-    res.json({ message: 'Homepage' });
+    const videoId = req.params.filename;
+    const videoFilePath = path.join(videoDirectory, `${videoId}.mp4`);
+
+    const { filename } = req.params;
+
+    // Set proper content type for the response
+    res.setHeader('Content-Type', 'video/mp4');
+
+    // Create a readable stream from the video file
+    const videoStream = fs.createReadStream(videoFilePath);
+
+    // Pipe the video stream to the response
+    videoStream.pipe(res);
+
 });
 
 const port = process.env.PORT || 5000;

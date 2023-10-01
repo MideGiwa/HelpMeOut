@@ -19,7 +19,7 @@
 
         startButton.addEventListener('click', async () => {
             try {
-                const stream = await navigator.mediaDevices.getDisplayMedia({ video: true });
+                stream = await navigator.mediaDevices.getDisplayMedia({ video: true });
                 const mediaRecorder = new MediaRecorder(stream);
 
                 mediaRecorder.ondataavailable = (event) => {
@@ -55,7 +55,7 @@
             formData.append('video', blob, 'screen-recording.webm');
 
             // Replace 'your_upload_endpoint' with your server's endpoint to handle the file upload
-            fetch('your_upload_endpoint', {
+            fetch('http://localhost:5000/upload/videoId', {
                 method: 'POST',
                 body: formData,
             }).then(response => {
