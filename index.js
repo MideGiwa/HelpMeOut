@@ -1,7 +1,6 @@
 const express = require('express');
 const app = express();
 const cors = require("cors");;
-//const router = require('./routes/videoRoute');
 
 const fs = require('fs');
 const bodyParser = require('body-parser');
@@ -11,7 +10,6 @@ app.use(express.json());
 app.use(cors());
 //app.use("/api", router);
 app.use('/videos', express.static('uploads'));
-const video64 = require('./video64')
 
 
 app.use(bodyParser.raw({ type: 'video/mp4', limit: '100mb' }));
