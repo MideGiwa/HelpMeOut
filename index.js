@@ -6,6 +6,7 @@ const fs = require('fs');
 const bodyParser = require('body-parser');
 const path = require('path');
 const { v4: uuidv4 } = require('uuid');
+const { transcribeAudio } = require('./services/transcribtion');
 app.use(express.json());
 app.use(cors());
 //app.use("/api", router);
@@ -49,9 +50,25 @@ app.post('/upload/:videoId', (req, res) => {
     });
 });
 
+
+app.get('/transcribe-audio', (req, res) => {
+    const videoId = 'lv_0_20230927233406';
+    const videoFilePath = path.join(videoDirectory, `lv_0_20230927233406.mp4`);
+    const audioFilePath = path.join(videoDirectory, `${videoId}.mp3`)
+
+
+    const transcribedAudio = transcribeAudio(videoFilePath, audioFilePath);
+
+    console.log(transcribedAudio);
+})
 app.get('/videos/:filename', (req, res) => {
     const videoId = req.params.filename;
-    const videoFilePath = path.join(videoDirectory, `${videoId}.mp4`);
+    const videoFilePath = path.join(videoDirectory, `lv_0_20230927233406.mp4`);
+    const audioFilePath = path.join(videoDirectory, `${videoId}.mp3`)
+
+
+    const transcribedAudio = transcribeAudio(videoFilePath, audioFilePath)
+
 
     const { filename } = req.params;
 
