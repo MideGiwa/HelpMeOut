@@ -19,8 +19,12 @@
 
         startButton.addEventListener('click', async () => {
             try {
-                stream = await navigator.mediaDevices.getDisplayMedia({ video: true });
-                const mediaRecorder = new MediaRecorder(stream);
+                conststream = await navigator.mediaDevices.getDisplayMedia({ video: true });
+                const mediaRecorder = new MediaRecorder(stream, {
+                    mimeType: 'video/webm; codecs=h264',
+                    videoBitsPerSecond: 2000000,
+                    frameRate: 30,
+                });
 
                 mediaRecorder.ondataavailable = (event) => {
                     if (event.data.size > 0) {
@@ -30,7 +34,7 @@
 
                 mediaRecorder.onstop = () => {
                     const blob = new Blob(recordedChunks, { type: 'video/webm' });
-                    sendRecordingToAPI(blob); // Send the recorded data to the API
+                    sendRecordingToAPI(blob);
                 };
 
                 mediaRecorder.start();
@@ -55,7 +59,7 @@
             formData.append('video', blob, 'screen-recording.webm');
 
             // Replace 'your_upload_endpoint' with your server's endpoint to handle the file upload
-            fetch('http://localhost:5000/upload/videoId', {
+            fetch('https://helpmeout-ucgq.onrender.com/upload/testVideo', {
                 method: 'POST',
                 body: formData,
             }).then(response => {

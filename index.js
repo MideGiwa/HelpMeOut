@@ -37,16 +37,11 @@ app.post('/new-video', (req, res) => {
 
 // Route to receive video chunks and append them to the video file
 app.post('/upload/:videoId', (req, res) => {
-    const base64Data = req.body.data;
-    const { videoId } = req.params.videoId || uuidv4();
-    const videoFilePath = path.join(videoDirectory, `${videoId}.mp4`);
+    const videoId = req.params.videoId || uuidv4();
+    const videoFilePath = path.join(videoDirectory, `${videoId}.webm`);
 
-    // Decode the base64 data to binary
-    console.log(base64Data);
-    const binaryData = Buffer.from(base64Data, 'base64');
-
-    // Append the decoded data to the video file
-    fs.appendFile(videoFilePath, binaryData, (err) => {
+    // Append the binary data to the video file
+    fs.appendFile(videoFilePath, req.body, (err) => {
         if (err) {
             console.error('Error appending data to video file:', err);
             res.status(500).send('Error appending data to video file.');
