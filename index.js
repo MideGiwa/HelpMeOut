@@ -51,32 +51,33 @@ app.post('/upload/:videoId', (req, res) => {
 });
 
 
-app.get('/transcribe-audio', (req, res) => {
-    const videoId = 'lv_0_20230927233406';
-    const videoFilePath = path.join(videoDirectory, `lv_0_20230927233406.mp4`);
-    const audioFilePath = path.join(videoDirectory, `${videoId}.mp3`)
+// app.get('/transcribe-audio', (req, res) => {
+//     const videoId = 'lv_0_20230927233406';
+//     const videoFilePath = path.join(videoDirectory, `lv_0_20230927233406.mp4`);
+//     const audioFilePath = path.join(videoDirectory, `${videoId}.mp3`)
 
 
-    const transcribedAudio = transcribeAudio(videoFilePath, audioFilePath);
+//     const transcribedAudio = transcribeAudio(videoFilePath, audioFilePath);
 
-    console.log(transcribedAudio);
-})
+//     console.log(transcribedAudio);
+// })
+
+
 app.get('/videos/:filename', (req, res) => {
     const videoId = req.params.filename;
     const videoFilePath = path.join(videoDirectory, `lv_0_20230927233406.mp4`);
-    const audioFilePath = path.join(videoDirectory, `${videoId}.mp3`)
+    const audioFilePath = path.join(videoDirectory, `${videoId}.wav`)
 
 
     const transcribedAudio = transcribeAudio(videoFilePath, audioFilePath)
-
-
-    const { filename } = req.params;
 
     // Set proper content type for the response
     res.setHeader('Content-Type', 'video/mp4');
 
     // Create a readable stream from the video file
     const videoStream = fs.createReadStream(videoFilePath);
+
+    res.json({ transcribtion: transcribedAudio });
 
     // Pipe the video stream to the response
     videoStream.pipe(res);
